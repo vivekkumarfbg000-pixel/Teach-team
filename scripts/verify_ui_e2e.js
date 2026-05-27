@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { spawn, spawnSync } from 'child_process';
 import http from 'http';
-import puppeteer from 'puppeteer-core';
+// puppeteer-core imported dynamically below to prevent static resolution failures
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -117,6 +117,8 @@ async function waitOnServer(retries = 15, delay = 1000) {
 
   if (chromePath) {
     try {
+      const puppeteerModule = await import('puppeteer-core');
+      const puppeteer = puppeteerModule.default || puppeteerModule;
       console.log('\n🎬 Launching headless browser viewport...');
       const browser = await puppeteer.launch({
         executablePath: chromePath,

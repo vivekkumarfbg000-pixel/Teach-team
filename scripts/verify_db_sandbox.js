@@ -135,14 +135,19 @@ if (isDockerAvailable) {
       const sql = fs.readFileSync(filePath, 'utf8');
       
       // Basic SQL compiler checking: catch unmatched quotes, parentheses, or broken statements
-      const openParens = (sql.match(/\(/g) || []).length;
-      const closeParens = (sql.match(/\)/g) || []).length;
+      // Strip comments: single-line (-- ...) and multi-line (/* ... */)
+      const cleanSql = sql
+        .replace(/--.*$/gm, '')
+        .replace(/\/\*[\s\S]*?\*\//g, '');
+
+      const openParens = (cleanSql.match(/\(/g) || []).length;
+      const closeParens = (cleanSql.match(/\)/g) || []).length;
       if (openParens !== closeParens) {
         console.warn(`   ⚠️  [Syntax Alert] Unmatched parenthesis block detected in ${file} (Open: ${openParens}, Close: ${closeParens}).`);
         issuesFound++;
       }
       
-      const openQuotes = (sql.match(/'/g) || []).length;
+      const openQuotes = (cleanSql.match(/'/g) || []).length;
       if (openQuotes % 2 !== 0) {
         console.warn(`   ⚠️  [Syntax Alert] Unmatched single quote (') detected in ${file} (Count: ${openQuotes}).`);
         issuesFound++;

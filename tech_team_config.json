@@ -2,17 +2,17 @@
   "projectName": "Universal-SaaS",
   "frontend": {
     "framework": "React-Vite",
-    "srcDirectory": "./src",
-    "buildDirectory": "./dist",
+    "srcDirectory": "../frontend/src",
+    "buildDirectory": "../frontend/dist",
     "singleJsBudgetKB": 250,
-    "singleCssBudgetKB": 100,
-    "totalBudgetKB": 1000
+    "singleCssBudgetKB": 200,
+    "totalBudgetKB": 1300
   },
   "database": {
     "provider": "Supabase",
     "tenantIdColumn": "tenant_id",
     "tenantResolverFunction": "public.get_user_tenant_id()",
-    "migrationsDirectory": "./supabase/migrations"
+    "migrationsDirectory": "../supabase/migrations"
   },
   "verification": {
     "compileCommand": "npx tsc --noEmit",

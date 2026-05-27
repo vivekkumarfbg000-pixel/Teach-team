@@ -125,10 +125,11 @@ if (fs.existsSync(migrationsDir)) {
     const content = fs.readFileSync(filePath, 'utf8');
     
     // Check if new tables are created without enabling RLS
-    const tableMatches = content.match(/create\s+table\s+(\w+\.?\w*)/gi) || [];
+    const tableMatches = [...content.matchAll(/create\s+table\s+(?:if\s+not\s+exists\s+)?([\w.]+)/gi)];
     tableMatches.forEach(match => {
-      const tableName = match.split(/\s+/).pop();
-      const rlsEnabled = new RegExp(`alter\\s+table\\s+${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i').test(content);
+      const tableName = match[1];
+      const rlsEnabled = new RegExp(`alter\\s+table\\s+${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i').test(content) ||
+                         new RegExp(`alter\\s+table\\s+public\\.${tableName.split('.').pop()}\\s+enable\\s+row\\s+level\\s+security`, 'i').test(content);
       if (!rlsEnabled && !tableName.includes('schema_migrations')) {
         console.warn(`   ⚠️  [RLS Vulnerability] Table "${tableName}" created in ${file} without an explicit ENABLE ROW LEVEL SECURITY statement.`);
         issuesFound++;
