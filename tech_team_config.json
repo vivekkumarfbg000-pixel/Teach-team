@@ -10,8 +10,8 @@
   },
   "database": {
     "provider": "Supabase",
-    "tenantIdColumn": "tenant_id",
-    "tenantResolverFunction": "public.get_user_tenant_id()",
+    "tenantIdColumn": "pod_id",
+    "tenantResolverFunction": "public.get_user_pod()",
     "migrationsDirectory": "../supabase/migrations"
   },
   "verification": {

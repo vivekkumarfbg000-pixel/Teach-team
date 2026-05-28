@@ -50,12 +50,12 @@ if (chromePath) {
 
 // ─── 2. Compile and Start Preview Server ────────────────────────────────
 const port = 4173;
-const previewUrl = `http://localhost:${port}`;
+const previewUrl = `http://127.0.0.1:${port}`;
 
 console.log('\n📦 Compiling production distribution bundle...');
 try {
   // Execute clean production build dynamically
-  const buildResult = spawnSync('npm', ['run', 'build'], { shell: true, stdio: 'inherit' });
+  const buildResult = spawnSync('npm', ['run', 'build'], { shell: true, stdio: 'inherit', cwd: process.cwd() });
   if (buildResult.status !== 0) {
     console.error('❌ [Build Failure] Production build compile failed.');
     process.exit(1);
@@ -67,9 +67,16 @@ try {
 }
 
 console.log('\n🚀 Spinning up local preview server...');
-const previewProcess = spawn('npm', ['run', 'preview', '--', '--port', port.toString()], {
-  shell: true,
-  stdio: 'ignore'
+const previewProcess = spawn('node', ['node_modules/vite/bin/vite.js', 'preview', '--port', port.toString(), '--host', '127.0.0.1'], {
+  cwd: process.cwd()
+});
+
+previewProcess.stdout.on('data', (data) => {
+  console.log(`   [Preview Server]: ${data.toString().trim()}`);
+});
+
+previewProcess.stderr.on('data', (data) => {
+  console.error(`   [Preview Server Error]: ${data.toString().trim()}`);
 });
 
 // Graceful cleanup handler
@@ -99,6 +106,7 @@ async function waitOnServer(retries = 15, delay = 1000) {
       });
       return true;
     } catch (e) {
+      console.log(`   Pinging ${previewUrl} failed (attempt ${i + 1}/15): ${e.message}`);
       await new Promise(r => setTimeout(r, delay));
     }
   }
