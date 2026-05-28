@@ -68,7 +68,8 @@ try {
 
 console.log('\n🚀 Spinning up local preview server...');
 const previewProcess = spawn('node', ['node_modules/vite/bin/vite.js', 'preview', '--port', port.toString(), '--host', '127.0.0.1'], {
-  cwd: process.cwd()
+  cwd: process.cwd(),
+  shell: true
 });
 
 previewProcess.stdout.on('data', (data) => {
