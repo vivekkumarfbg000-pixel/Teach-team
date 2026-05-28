@@ -10,10 +10,23 @@ console.log('──────────────────────�
 console.log('📊 SYSTEM TELEMETRY: RUNNING PRODUCTION TELEMETRY & DIAGNOSTIC SCAN');
 console.log('──────────────────────────────────────────────────────────────────\n');
 
+// 0. Load Universal Tech Team Configuration
+const configPath = path.resolve(__dirname, '../tech_team_config.json');
+let config = {};
+if (fs.existsSync(configPath)) {
+  try {
+    config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  } catch (e) {
+    console.warn(`⚠️  Failed parsing tech_team_config.json: ${e.message}`);
+  }
+}
+
 let issuesFound = 0;
 
 // 1. Audit Migration File Sequencing
-const migrationsDir = path.resolve(__dirname, '../supabase/migrations');
+const migrationsDir = config.database?.migrationsDirectory 
+  ? path.resolve(__dirname, '..', config.database.migrationsDirectory) 
+  : path.resolve(__dirname, '../supabase/migrations');
 if (fs.existsSync(migrationsDir)) {
   console.log('📂 1. Auditing Supabase Migration Files Sequence...');
   const files = fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql'));
